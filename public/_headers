@@ -40,3 +40,6 @@
 
 /ads-img/*
   Cache-Control: public, max-age=2592000
+
+/logo.png
+  Cache-Control: public, max-age=0, must-revalidate
