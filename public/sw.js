@@ -4,8 +4,7 @@ const PAGE_CACHE = `${SW_VERSION}-pages`;
 const ASSET_CACHE = `${SW_VERSION}-assets`;
 const CORE_ASSETS = [
   '/',
-  '/favicon.ico',
-  '/pwa-192.png',
+    '/pwa-192.png',
   '/pwa-512.png',
   '/manifest.webmanifest',
   '/offline.html'
