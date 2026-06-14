@@ -815,7 +815,7 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
                   )}
                   <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                     <Coffee size={13} className="text-amber-700 dark:text-amber-600" />
-                    <span>由咖啡与代码驱动</span>
+                    <span>By ZSFan</span>
                   </motion.div>
                 </div>
               </div>
