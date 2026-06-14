@@ -393,7 +393,49 @@ async function sha256(str) {
 }
 
 // ── 登录 ──────────────────────────────────────────
-async function doLogin() {
+function persistAuth(password, token) {
+  try {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ password, token }));
+  } catch (error) {
+    console.warn('Failed to persist auth:', error);
+  }
+}
+
+function clearPersistedAuth() {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch (error) {
+    console.warn('Failed to clear persisted auth:', error);
+  }
+}
+
+function setAuthInputs(password = '', token = '') {
+  const passwordInput = document.getElementById('password-input');
+  const tokenInput = document.getElementById('token-input');
+  if (passwordInput) passwordInput.value = password;
+  if (tokenInput) tokenInput.value = token;
+}
+
+async function tryRestoreLogin() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    const password = typeof saved?.password === 'string' ? saved.password : '';
+    const token = typeof saved?.token === 'string' ? saved.token : '';
+    if (!password || !token) {
+      clearPersistedAuth();
+      return;
+    }
+    setAuthInputs(password, token);
+    await doLogin(true);
+  } catch (error) {
+    console.warn('Failed to restore login:', error);
+    clearPersistedAuth();
+  }
+}
+
+async function doLogin(isRestore = false) {
   const pwd = document.getElementById('password-input').value;
   const token = document.getElementById('token-input').value.trim();
   const hash = await sha256(pwd);
