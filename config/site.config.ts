@@ -9,7 +9,7 @@ export const siteConfig = {
   footerText: '© 2026 ZSFan 的博客',
   url: 'https://blog-buh.pages.dev',
   social: {
-    github: 'https://github.com/ZSFan888/',
+    github: 'https://github.com/zhangshengfan/',
     email: 'mailto:zsfan-nb@hotmail.com',
     rawEmail: 'zsfan-nb@hotmail.com',
   },
