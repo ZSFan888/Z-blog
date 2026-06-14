@@ -7,7 +7,7 @@ export const siteConfig = {
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
-  url: 'https://blog-buh.pages.dev',
+  url: 'https://blog.zsfan8986.dpdns.org',
   social: {
     github: 'https://github.com/zhangshengfan/',
     email: 'mailto:zsfan-nb@hotmail.com',
@@ -23,8 +23,8 @@ export const siteConfig = {
     collapseInactiveRootBranches: true,
   },
   friendsPage: {
-    repoUrl: 'https://github.com/ZSFan888/Blog',
-    repoFriendsUrl: 'https://github.com/ZSFan888/Blog/tree/main/friends',
+    repoUrl: 'https://github.com/zhangshengfan/',
+    repoFriendsUrl: 'https://github.com/zhangshengfan/',
     repoFriendsDir: 'friends',
     announcement: '博客已重置完成，新的内容将从这里重新开始。',
   },
