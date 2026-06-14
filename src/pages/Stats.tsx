@@ -162,7 +162,7 @@ export const Stats = () => {
 
         <div className="flex justify-center">
           <a
-            href="https://cloud.umami.is/share/lbt9NW1ZYgWpm1KO"
+            href="https://cloud.umami.is/share/Bdor1JZalpGTV6rF"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-14 w-full max-w-xl items-center justify-center gap-3 rounded-2xl border border-zinc-300 bg-zinc-900 px-6 py-4 text-base font-bold text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-white dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:ring-offset-zinc-950 sm:text-lg"
@@ -188,7 +188,7 @@ export const Stats = () => {
 
         <div className="flex justify-center">
           <a
-            href="https://stats.uptimerobot.com/NcIOI9kfVP"
+            href="https://stats.uptimerobot.com/brdUi25J7V"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-14 w-full max-w-xl items-center justify-center gap-3 rounded-2xl border border-zinc-300 bg-zinc-900 px-6 py-4 text-base font-bold text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 focus:ring-offset-white dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:ring-offset-zinc-950 sm:text-lg"
