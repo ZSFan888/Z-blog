@@ -785,11 +785,11 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
 
               <div className="flex flex-col items-center md:items-start">
                 <h4 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700 dark:text-zinc-300 md:mb-6 md:text-sm md:tracking-widest">Tech Stack</h4>
-                <div className="grid w-full max-w-sm grid-cols-2 gap-2 sm:max-w-xs md:flex md:max-w-xs md:flex-wrap md:justify-start">
+                <div className="grid w-full max-w-sm grid-cols-1 gap-2 sm:grid-cols-2 sm:max-w-xs md:flex md:max-w-xs md:flex-wrap md:justify-start">
                   {technologies.map((tech, index) => (
-                    <motion.div key={tech.name} initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.22, delay: index * 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-100 px-2.5 py-1.5 text-[11px] font-bold text-zinc-700 transition-all duration-200 hover:-translate-y-px hover:border-zinc-900/30 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:border-zinc-100/30 sm:px-3 sm:text-xs md:justify-start">
+                    <motion.div key={tech.name} initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.22, delay: index * 0.03, ease: easeSmooth }} className="flex min-w-0 items-center justify-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-100 px-2.5 py-1.5 text-[11px] font-bold text-zinc-700 transition-all duration-200 hover:-translate-y-px hover:border-zinc-900/30 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:border-zinc-100/30 sm:px-3 sm:text-xs md:justify-start">
                       <tech.icon size={12} className="text-zinc-700 dark:text-zinc-300" />
-                      <span className="truncate">{tech.name}</span>
+                      <span className="min-w-0 break-words text-center leading-snug whitespace-normal md:text-left">{tech.name}</span>
                     </motion.div>
                   ))}
                 </div>
