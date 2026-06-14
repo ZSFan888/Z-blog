@@ -137,7 +137,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
     </div>
     <div class="field">
       <label>GitHub Token</label>
-      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      <input type="password" id="token-input" placeholder="ghp_xxx 或 github_pat_xxx" autocomplete="off">
       <span style="font-size:11px;color:var(--muted);margin-top:2px">用于提交文章到 GitHub，仅存在本地内存中</span>
     </div>
     <button class="btn btn-primary" onclick="doLogin()">登录</button>
@@ -153,6 +153,7 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
       <nav class="tab-nav">
         <button class="tab active" onclick="switchTab('posts')">文章</button>
         <button class="tab" onclick="switchTab('friends')">友链</button>
+        <button class="tab" onclick="switchTab('settings')">设置</button>
       </nav>
     </div>
     <div class="topbar-right">
@@ -302,12 +303,65 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
   </div>
 </div>
 
+  <!-- Settings Panel -->
+  <div class="panel" id="settings-panel">
+    <div class="panel-header">
+      <h2>站点设置</h2>
+      <button class="btn btn-accent" onclick="saveSiteSettings()">保存到 GitHub</button>
+    </div>
+    <div class="editor-layout">
+      <div class="editor-main">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">基础信息</div>
+          <div class="form-group"><label class="form-label">博客名称</label><input class="form-input" id="s-title" placeholder="ZSFan 的博客"></div>
+          <div class="form-group"><label class="form-label">副标题</label><input class="form-input" id="s-subtitle" placeholder="凡的博客"></div>
+          <div class="form-group"><label class="form-label">描述</label><textarea class="form-input form-textarea" id="s-description" placeholder="站点 SEO 描述"></textarea></div>
+          <div class="form-group"><label class="form-label">站点域名</label><input class="form-input" id="s-url" placeholder="https://blog-buh.pages.dev"></div>
+          <div class="form-group"><label class="form-label">页脚文字</label><input class="form-input" id="s-footerText" placeholder="©2026 ZSFan 的 Blog"></div>
+          <div class="form-group"><label class="form-label">Logo URL</label><input class="form-input" id="s-logo" placeholder="/logo.png"></div>
+          <div class="form-group"><label class="form-label">SEO 图片 URL</label><input class="form-input" id="s-seoImage" placeholder="/logo.png"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">作者信息</div>
+          <div class="form-group"><label class="form-label">昵称</label><input class="form-input" id="s-author-name" placeholder="ZSFan"></div>
+          <div class="form-group"><label class="form-label">头像 URL</label><input class="form-input" id="s-author-avatar" placeholder="https://..."></div>
+          <div class="form-group"><label class="form-label">身份 / 职位</label><input class="form-input" id="s-author-role" placeholder="开发者"></div>
+          <div class="form-group"><label class="form-label">个人简介</label><textarea class="form-input form-textarea" id="s-author-bio" placeholder="个人简介"></textarea></div>
+        </div>
+      </div>
+
+      <div class="editor-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">社交信息</div>
+          <div class="form-group"><label class="form-label">GitHub</label><input class="form-input" id="s-github" placeholder="https://github.com/ZSFan888/"></div>
+          <div class="form-group"><label class="form-label">邮箱（mailto）</label><input class="form-input" id="s-email" placeholder="mailto:zsfan@example.com"></div>
+          <div class="form-group"><label class="form-label">原始邮箱</label><input class="form-input" id="s-rawEmail" placeholder="zsfan@example.com"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">备案信息</div>
+          <div class="form-group"><label class="form-label">备案文字</label><input class="form-input" id="s-beian-text" placeholder="粤ICP备xxxx号"></div>
+          <div class="form-group"><label class="form-label">备案链接</label><input class="form-input" id="s-beian-url" placeholder="https://beian.miit.gov.cn/"></div>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">友链页面</div>
+          <div class="form-group"><label class="form-label">仓库地址</label><input class="form-input" id="s-repoUrl" placeholder="https://github.com/ZSFan888/Z-blog"></div>
+          <div class="form-group"><label class="form-label">友链目录地址</label><input class="form-input" id="s-repoFriendsUrl" placeholder="https://github.com/ZSFan888/Z-blog/tree/main/friends"></div>
+          <div class="form-group"><label class="form-label">友链目录名</label><input class="form-input" id="s-repoFriendsDir" placeholder="friends"></div>
+          <div class="form-group"><label class="form-label">友链申请说明</label><textarea class="form-input form-textarea" id="s-announcement" placeholder="友链申请说明"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div class="loading" id="loading"><div class="spinner"></div></div>
 <div id="toast"></div>
 
 <script>
 // ── 配置 ──────────────────────────────────────────
-const REPO = 'ZSFan888/Blog';
+const REPO = 'ZSFan888/Z-blog';
 const BRANCH = 'main';
 // 密码哈希（SHA-256 of "@ZSFan1224"）
 const PWD_HASH = 'a8b3f2e1d4c5b6a7e8f9d0c1b2a3f4e5d6c7b8a9e0f1d2c3b4a5f6e7d8c9b0a1';
@@ -318,6 +372,7 @@ let posts = [];
 let friends = [];
 let currentPost = null;
 let currentFriend = null;
+let currentSettings = { sha: null, raw: '' };
 let easyMDE = null;
 let currentTab = 'posts';
 
@@ -339,8 +394,8 @@ async function doLogin() {
     document.getElementById('login-error').style.display = 'block';
     return;
   }
-  if (!token || !token.startsWith('ghp_')) {
-    showToast('请输入有效的 GitHub Token（ghp_ 开头）', 'error');
+  if (!token || !(token.startsWith('ghp_') || token.startsWith('github_pat_'))) {
+    showToast('请输入有效的 GitHub Token', 'error');
     return;
   }
   ghToken = token;
@@ -391,15 +446,23 @@ async function listDir(dir) {
   catch { return []; }
 }
 
+async function getFileContent(path) {
+  const f = await ghAPI(`contents/${path}?ref=${BRANCH}`);
+  const content = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
+  return { sha: f.sha, content };
+}
+
 // ── 加载数据 ──────────────────────────────────────
 async function loadData() {
   showLoading(true);
   try {
-    const [postFiles, friendFiles] = await Promise.all([listDir('posts'), listDir('friends')]);
+    const [postFiles, friendFiles, settingsFile] = await Promise.all([listDir('posts'), listDir('friends'), getFileContent('config/site.config.ts')]);
     posts = postFiles.filter(f => f.name.endsWith('.md')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
     friends = friendFiles.filter(f => f.name.endsWith('.json')).map(f => ({ name: f.name, sha: f.sha, path: f.path }));
+    currentSettings = { sha: settingsFile.sha, raw: settingsFile.content };
     renderPostList();
     renderFriendList();
+    renderSettingsForm();
   } catch(e) {
     showToast('加载失败：' + e.message, 'error');
   }
@@ -670,6 +733,155 @@ async function deleteFriend() {
     await loadData();
     backToList();
   } catch(e) { showToast('删除失败：' + e.message, 'error'); }
+  showLoading(false);
+}
+
+
+// ── 站点设置 ─────────────────────────────────────
+function readConfigValue(source, pattern, fallback = '') {
+  const match = source.match(pattern);
+  return match ? match[1] : fallback;
+}
+
+function parseSiteConfig(source) {
+  return {
+    title: readConfigValue(source, /title:\s*'([^']*)'/),
+    subtitle: readConfigValue(source, /subtitle:\s*'([^']*)'/),
+    description: readConfigValue(source, /description:\s*'([^']*)'/),
+    logo: readConfigValue(source, /logo:\s*'([^']*)'/),
+    seoImage: readConfigValue(source, /seoImage:\s*'([^']*)'/),
+    footerText: readConfigValue(source, /footerText:\s*'([^']*)'/),
+    url: readConfigValue(source, /url:\s*'([^']*)'/),
+    github: readConfigValue(source, /github:\s*'([^']*)'/),
+    email: readConfigValue(source, /email:\s*'([^']*)'/),
+    rawEmail: readConfigValue(source, /rawEmail:\s*'([^']*)'/),
+    authorName: readConfigValue(source, /name:\s*'([^']*)'/),
+    authorAvatar: readConfigValue(source, /avatar:\s*'([^']*)'/),
+    authorRole: readConfigValue(source, /role:\s*'([^']*)'/),
+    authorBio: readConfigValue(source, /bio:\s*'([^']*)'/),
+    repoUrl: readConfigValue(source, /repoUrl:\s*'([^']*)'/),
+    repoFriendsUrl: readConfigValue(source, /repoFriendsUrl:\s*'([^']*)'/),
+    repoFriendsDir: readConfigValue(source, /repoFriendsDir:\s*'([^']*)'/),
+    announcement: readConfigValue(source, /announcement:\s*'([^']*)'/),
+    beianText: readConfigValue(source, /beian:\s*\{[\s\S]*?text:\s*'([^']*)'/),
+    beianUrl: readConfigValue(source, /beian:\s*\{[\s\S]*?url:\s*'([^']*)'/),
+  };
+}
+
+function renderSettingsForm() {
+  const cfg = parseSiteConfig(currentSettings.raw || '');
+  const map = {
+    's-title': cfg.title,
+    's-subtitle': cfg.subtitle,
+    's-description': cfg.description,
+    's-url': cfg.url,
+    's-footerText': cfg.footerText,
+    's-logo': cfg.logo,
+    's-seoImage': cfg.seoImage,
+    's-author-name': cfg.authorName,
+    's-author-avatar': cfg.authorAvatar,
+    's-author-role': cfg.authorRole,
+    's-author-bio': cfg.authorBio,
+    's-github': cfg.github,
+    's-email': cfg.email,
+    's-rawEmail': cfg.rawEmail,
+    's-beian-text': cfg.beianText,
+    's-beian-url': cfg.beianUrl,
+    's-repoUrl': cfg.repoUrl,
+    's-repoFriendsUrl': cfg.repoFriendsUrl,
+    's-repoFriendsDir': cfg.repoFriendsDir,
+    's-announcement': cfg.announcement,
+  };
+  Object.entries(map).forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value || '';
+  });
+}
+
+function escTS(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+async function saveSiteSettings() {
+  const data = {
+    title: document.getElementById('s-title').value.trim(),
+    subtitle: document.getElementById('s-subtitle').value.trim(),
+    description: document.getElementById('s-description').value.trim(),
+    url: document.getElementById('s-url').value.trim(),
+    footerText: document.getElementById('s-footerText').value.trim(),
+    logo: document.getElementById('s-logo').value.trim(),
+    seoImage: document.getElementById('s-seoImage').value.trim(),
+    github: document.getElementById('s-github').value.trim(),
+    email: document.getElementById('s-email').value.trim(),
+    rawEmail: document.getElementById('s-rawEmail').value.trim(),
+    authorName: document.getElementById('s-author-name').value.trim(),
+    authorAvatar: document.getElementById('s-author-avatar').value.trim(),
+    authorRole: document.getElementById('s-author-role').value.trim(),
+    authorBio: document.getElementById('s-author-bio').value.trim(),
+    repoUrl: document.getElementById('s-repoUrl').value.trim(),
+    repoFriendsUrl: document.getElementById('s-repoFriendsUrl').value.trim(),
+    repoFriendsDir: document.getElementById('s-repoFriendsDir').value.trim(),
+    announcement: document.getElementById('s-announcement').value.trim(),
+    beianText: document.getElementById('s-beian-text').value.trim(),
+    beianUrl: document.getElementById('s-beian-url').value.trim(),
+  };
+
+  if (!data.title || !data.description || !data.url || !data.authorName) {
+    showToast('请至少填写博客名称、描述、域名、作者名', 'error');
+    return;
+  }
+
+  const content = `// 博客配置文件
+// VITE_SITE_URL 环境变量优先于此处的 url 配置
+export const siteConfig = {
+  title: '${escTS(data.title)}',
+  subtitle: '${escTS(data.subtitle)}',
+  description: '${escTS(data.description)}',
+  logo: '${escTS(data.logo || '/logo.png')}',
+  seoImage: '${escTS(data.seoImage || '/logo.png')}',
+  footerText: '${escTS(data.footerText)}',
+  url: '${escTS(data.url)}',
+  social: {
+    github: '${escTS(data.github)}',
+    email: '${escTS(data.email)}',
+    rawEmail: '${escTS(data.rawEmail)}',
+  },
+  author: {
+    name: '${escTS(data.authorName)}',
+    avatar: '${escTS(data.authorAvatar)}',
+    role: '${escTS(data.authorRole)}',
+    bio: '${escTS(data.authorBio)}',
+  },
+  toc: {
+    collapseInactiveRootBranches: true,
+  },
+  friendsPage: {
+    repoUrl: '${escTS(data.repoUrl)}',
+    repoFriendsUrl: '${escTS(data.repoFriendsUrl)}',
+    repoFriendsDir: '${escTS(data.repoFriendsDir || 'friends')}',
+    announcement: '${escTS(data.announcement)}',
+  },
+  beian: {
+    text: '${escTS(data.beianText)}',
+    url: '${escTS(data.beianUrl)}',
+  },
+};
+`;
+
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+  showLoading(true);
+  try {
+    await ghAPI('contents/config/site.config.ts', 'PUT', {
+      message: 'chore: update site settings from admin panel',
+      content: encoded,
+      branch: BRANCH,
+      ...(currentSettings.sha ? { sha: currentSettings.sha } : {}),
+    });
+    showToast('站点设置已保存', 'success');
+    await loadData();
+  } catch(e) {
+    showToast('保存失败：' + e.message, 'error');
+  }
   showLoading(false);
 }
 
