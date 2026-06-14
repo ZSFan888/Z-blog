@@ -122,6 +122,10 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
 .EasyMDEContainer .editor-toolbar button{color:var(--muted)!important}
 .EasyMDEContainer .editor-toolbar button:hover,.EasyMDEContainer .editor-toolbar button.active{background:var(--bg)!important;border-color:var(--border)!important}
 .EasyMDEContainer .editor-statusbar{color:var(--muted);font-size:11px}
+.cover-preview{display:none;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2)}
+.cover-preview.show{display:block}
+.cover-preview img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.helper-text{font-size:11px;color:var(--muted);line-height:1.5}
 </style>
 </head>
 <body>
@@ -197,6 +201,8 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
       </div>
       <div class="editor-actions">
         <button class="btn btn-sm btn-ghost btn-danger" id="delete-btn" onclick="deletePost()" style="display:none">删除</button>
+        <button class="btn btn-sm btn-ghost" type="button" onclick="previewPost()">预览文章</button>
+        <button class="btn btn-sm btn-ghost" type="button" onclick="copyPostLink()">复制链接</button>
         <button class="btn btn-sm btn-ghost" onclick="backToList()">取消</button>
         <button class="btn btn-sm btn-accent" onclick="savePost()">发布到 GitHub</button>
       </div>
@@ -250,7 +256,11 @@ body{background:var(--bg);color:var(--text);min-height:100dvh}
           <div class="sidebar-card-title">封面 & 选项</div>
           <div class="form-group">
             <label class="form-label">封面图 URL（可选）</label>
-            <input type="text" class="form-input" id="f-cover" placeholder="/posts-img/cover.png">
+            <input type="text" class="form-input" id="f-cover" placeholder="/posts-img/cover.png" oninput="updateCoverPreview()">
+            <div class="helper-text">支持站内相对路径或完整图片 URL</div>
+          </div>
+          <div class="cover-preview" id="cover-preview">
+            <img id="cover-preview-img" src="" alt="封面预览">
           </div>
           <div class="form-group">
             <label class="form-label">置顶排序（可选）</label>
@@ -536,6 +546,7 @@ async function openEditor(idx) {
   document.getElementById('f-featured').checked = false;
   document.getElementById('f-draft').checked = false;
   document.getElementById('delete-btn').style.display = 'none';
+  updateCoverPreview();
   document.getElementById('editor-title').textContent = '新建文章';
 
   if (easyMDE) { easyMDE.toTextArea(); easyMDE = null; }
@@ -571,6 +582,7 @@ async function openEditor(idx) {
         document.getElementById('f-featured').checked = get('featured') === 'true';
         document.getElementById('f-draft').checked = get('draft') === 'true';
         document.getElementById('f-body').value = body;
+        updateCoverPreview();
       }
       document.getElementById('delete-btn').style.display = 'inline-flex';
       document.getElementById('editor-title').textContent = '编辑文章';
@@ -736,6 +748,69 @@ async function deleteFriend() {
   showLoading(false);
 }
 
+
+
+function getSiteBaseUrl() {
+  const input = document.getElementById('s-url');
+  if (input && input.value.trim()) return input.value.trim().replace(/\/$/, '');
+  const m = (currentSettings.raw || '').match(/url:\s*'([^']+)'/);
+  return (m ? m[1] : window.location.origin).replace(/\/$/, '');
+}
+
+function getPreviewPostUrl() {
+  const id = document.getElementById('f-id').value.trim();
+  if (!id) return '';
+  return `${getSiteBaseUrl()}/post/${encodeURIComponent(id)}`;
+}
+
+function updateCoverPreview() {
+  const input = document.getElementById('f-cover');
+  const wrap = document.getElementById('cover-preview');
+  const img = document.getElementById('cover-preview-img');
+  if (!input || !wrap || !img) return;
+  const value = input.value.trim();
+  if (!value) {
+    wrap.classList.remove('show');
+    img.removeAttribute('src');
+    return;
+  }
+  const src = /^https?:\/\//i.test(value) ? value : `${getSiteBaseUrl()}${value.startsWith('/') ? '' : '/'}${value}`;
+  img.onload = () => wrap.classList.add('show');
+  img.onerror = () => {
+    wrap.classList.remove('show');
+    showToast('封面图加载失败，请检查 URL', 'error');
+  };
+  img.src = src;
+}
+
+function previewPost() {
+  const url = getPreviewPostUrl();
+  if (!url) {
+    showToast('请先填写文章 ID', 'error');
+    return;
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+async function copyPostLink() {
+  const url = getPreviewPostUrl();
+  if (!url) {
+    showToast('请先填写文章 ID', 'error');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('文章链接已复制', 'success');
+  } catch {
+    const input = document.createElement('input');
+    input.value = url;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    input.remove();
+    showToast('文章链接已复制', 'success');
+  }
+}
 
 // ── 站点设置 ─────────────────────────────────────
 function readConfigValue(source, pattern, fallback = '') {
