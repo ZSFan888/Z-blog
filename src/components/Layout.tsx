@@ -796,26 +796,26 @@ const Footer = ({ isPostPage = false }: { isPostPage?: boolean }) => {
               </div>
 
               <div className="flex flex-col items-center md:items-end">
-                <h4 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700 dark:text-zinc-300 md:mb-6 md:text-sm md:tracking-widest">Status</h4>
+                <h4 className="mb-4 text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700 dark:text-zinc-300 md:mb-6 md:text-sm md:tracking-widest">状态</h4>
                 <div className="grid w-full max-w-sm grid-cols-1 gap-2.5 rounded-2xl border border-zinc-200/70 bg-white/70 p-3 text-center dark:border-zinc-800/80 dark:bg-zinc-900/40 md:max-w-none md:border-0 md:bg-transparent md:p-0 md:text-right">
                   <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 md:justify-end md:text-xs">
                     <span className="relative flex h-2 w-2">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                       <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
                     </span>
-                    <span>All Systems Normal</span>
+                    <span>系统运行正常</span>
                   </div>
                   {loadTime && (
                     <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                       <Zap size={13} className="text-yellow-500" />
                       <span>
-                        Page loaded in <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">{loadTime}</span>
+                        页面加载耗时 <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">{loadTime}</span>
                       </span>
                     </motion.div>
                   )}
                   <motion.div initial={{ opacity: 0, x: 6 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.25, delay: 0.03, ease: easeSmooth }} className="flex items-center justify-center gap-2 text-[11px] text-zinc-600 dark:text-zinc-300 md:justify-end md:text-xs">
                     <Coffee size={13} className="text-amber-700 dark:text-amber-600" />
-                    <span>Fueled by Coffee &amp; Code</span>
+                    <span>由咖啡与代码驱动</span>
                   </motion.div>
                 </div>
               </div>
