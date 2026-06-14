@@ -1,9 +1,9 @@
 // 博客配置文件
 // VITE_SITE_URL 环境变量优先于此处的 url 配置
 export const siteConfig = {
-  title: 'ZSFan 的博客',
+  title: 'ZSFan 的 Blog',
   subtitle: '记录开发、折腾与思考',
-  description: '一个关注 Android、Web 开发、自动化工具与日常折腾记录的个人博客。',
+  description: 'Blog🙂',
   logo: '/logo.png',
   seoImage: '/logo.png',
   footerText: '© 2026 ZSFan 的博客',
