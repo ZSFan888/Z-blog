@@ -17,7 +17,7 @@ export const siteConfig = {
     name: 'ZSFan',
     avatar: 'https://q1.qlogo.cn/g?b=qq&nk=1453508737&s=100',
     role: 'Developer',
-    bio: '专注 Android、全栈开发、自动化工具与产品细节。',
+    bio: 'Test 测试',
   },
   toc: {
     collapseInactiveRootBranches: true,
