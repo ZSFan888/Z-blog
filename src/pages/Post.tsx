@@ -670,6 +670,8 @@ export const Post = () => {
     () => createMarkdownComponents((image) => setPreviewImage(image), mermaidRenderer, headings),
     [mermaidRenderer, headings]
   );
+  const wordCount = useMemo(() => getWordCount(post?.content ?? ''), [post?.content]);
+  const readingTimeText = useMemo(() => getReadingTimeText(post?.content ?? ''), [post?.content]);
 
   if (loading) {
     return (
@@ -711,8 +713,6 @@ export const Post = () => {
 
   const authors = getDisplayAuthors(post);
   const authorsLabel = authors.map((author) => author.name).join('\u3001');
-  const wordCount = useMemo(() => getWordCount(post.content), [post.content]);
-  const readingTimeText = useMemo(() => getReadingTimeText(post.content), [post.content]);
 
   const postStructuredData = {
     '@context': 'https://schema.org',
