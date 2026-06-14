@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { easeOut } from '@/utils/motion';
 import DOMPurify from 'dompurify';
 
-import { ArrowLeft, ArrowRight, Clock, Calendar, ChevronRight, Shield, Share2, Copy, Check, Users, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, Calendar, ChevronRight, Shield, Share2, Copy, Check, Users, ExternalLink, FileText, History } from 'lucide-react';
 import { getPostById, getPosts } from '@/services/posts';
 import { Post as PostType, PostAuthor, PostMetadata } from '../types';
 import { siteConfig } from '@config/site.config';
@@ -46,6 +46,27 @@ const MERMAID_CONFIG = {
 const hasCodeBlocks = (content: string) => /^```[\w-]*[\s\S]*?^```/m.test(content);
 const hasMathExpressions = (content: string) => /\$\$[\s\S]*?\$\$|\\\(|\\\[/m.test(content);
 const hasMermaidDiagrams = (content: string) => /```mermaid\b/.test(content);
+
+const getWordCount = (content: string) => {
+  const plain = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/[>#*_~-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!plain) return 0;
+  const cjkChars = (plain.match(/[\u4e00-\u9fff]/g) || []).length;
+  const latinWords = plain.replace(/[\u4e00-\u9fff]/g, ' ').split(/\s+/).filter(Boolean).length;
+  return cjkChars + latinWords;
+};
+
+const getReadingTimeText = (content: string) => {
+  const count = getWordCount(content);
+  const minutes = Math.max(1, Math.ceil(count / 300));
+  return `约 ${minutes} 分钟阅读`;
+};
 
 const formatMetaDate = (dateText?: string) => {
   if (!dateText) {
@@ -170,7 +191,7 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
     <div className="group relative my-5 md:my-6">
       {/* Language badge */}
       {lang && (
-        <span className="code-lang-badge">{getLangDisplayName(lang)}</span>
+        <span className="absolute left-3 top-3 z-10 inline-flex items-center rounded-full border border-zinc-700 bg-zinc-900/85 px-2.5 py-1 text-[11px] font-medium text-zinc-300 backdrop-blur-sm">{getLangDisplayName(lang)}</span>
       )}
 
       {/* Copy button */}
@@ -195,7 +216,8 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
         <pre
           ref={preRef}
           {...props}
-          className={`${props.className || ''} !my-0 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !p-3 !pt-10 md:!p-6 md:!pt-7 ${needsExpand && !isExpanded ? 'code-block-collapsed' : 'code-block-expanded'}`}
+          className={`${props.className || ''} !my-0 overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-zinc-600 touch-pan-x !p-3 !pt-10 md:!p-6 md:!pt-7`}
+          style={needsExpand && !isExpanded ? { maxHeight: '32rem' } : undefined}
         >
           {childrenWithProps}
         </pre>
@@ -203,8 +225,9 @@ const PreBlock = ({ children, ...props }: React.DetailedHTMLProps<React.HTMLAttr
         {/* Expand/collapse overlay */}
         {needsExpand && !isExpanded && (
           <button
+            type="button"
             onClick={() => setIsExpanded(true)}
-            className="code-expand-btn"
+            className="absolute inset-x-0 bottom-0 z-10 flex h-20 items-end justify-center bg-gradient-to-t from-[#0d1117] via-[#0d1117]/95 to-transparent pb-3 text-xs font-medium text-zinc-300 hover:text-white"
             aria-label="展开完整代码"
           >
             展开完整代码
@@ -783,30 +806,39 @@ export const Post = () => {
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-xs font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 md:gap-x-6">
-              <span className="flex items-center">
-                <Users size={14} className="mr-2" /> {authorsLabel}
-              </span>
-              <span className="hidden h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700 md:block" />
-              <span className="flex items-center">
-                <Calendar size={14} className="mr-2" /> 发布于 {formatMetaDate(post.date)}
-              </span>
-              {post.updatedAt && post.updatedAt !== post.date && (
-                <>
-                  <span className="hidden h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700 md:block" />
-                  <span className="flex items-center">
-                    <Calendar size={14} className="mr-2" /> 最后更新 {formatMetaDate(post.updatedAt)}
-                  </span>
-                </>
-              )}
-              <span className="hidden h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700 md:block" />
-              <span className="flex items-center">
-                <Clock size={14} className="mr-2" /> {post.readTime}
-              </span>
-              <span className="hidden h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700 md:block" />
-              <button type="button" onClick={() => setShareModalOpen(true)} className="flex items-center transition-colors hover:text-zinc-900 dark:hover:text-zinc-100" aria-label={`分享文章：${post.title}`}>
-                <Share2 size={14} className="mr-1.5" /> 分享
-              </button>
+            <div className="grid gap-3 md:grid-cols-[auto_auto_auto_auto] md:items-center md:justify-center">
+              <div className="rounded-2xl border border-zinc-200/80 bg-white/80 px-4 py-3 text-left shadow-sm shadow-zinc-200/40 backdrop-blur dark:border-white/10 dark:bg-zinc-900/70 dark:shadow-none">
+                <div className="mb-1 flex items-center text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+                  <History size={14} className="mr-2" /> 上次更新
+                </div>
+                <div className="text-sm font-semibold normal-case tracking-normal text-zinc-900 dark:text-zinc-100">
+                  {post.updatedAt && post.updatedAt !== post.date ? formatMetaDate(post.updatedAt) : '暂无更新'}
+                </div>
+              </div>
+              <div className="rounded-2xl border border-zinc-200/80 bg-white/80 px-4 py-3 text-left shadow-sm shadow-zinc-200/40 backdrop-blur dark:border-white/10 dark:bg-zinc-900/70 dark:shadow-none">
+                <div className="mb-1 flex items-center text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+                  <Clock size={14} className="mr-2" /> 预计阅读
+                </div>
+                <div className="text-sm font-semibold normal-case tracking-normal text-zinc-900 dark:text-zinc-100">{readingTimeText}</div>
+              </div>
+              <div className="rounded-2xl border border-zinc-200/80 bg-white/80 px-4 py-3 text-left shadow-sm shadow-zinc-200/40 backdrop-blur dark:border-white/10 dark:bg-zinc-900/70 dark:shadow-none">
+                <div className="mb-1 flex items-center text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+                  <FileText size={14} className="mr-2" /> 字数统计
+                </div>
+                <div className="text-sm font-semibold normal-case tracking-normal text-zinc-900 dark:text-zinc-100">{wordCount.toLocaleString('zh-CN')} 字</div>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-xs font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 md:justify-start">
+                <span className="flex items-center">
+                  <Users size={14} className="mr-2" /> {authorsLabel}
+                </span>
+                <span className="hidden h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700 md:block" />
+                <span className="flex items-center">
+                  <Calendar size={14} className="mr-2" /> 发布于 {formatMetaDate(post.date)}
+                </span>
+                <button type="button" onClick={() => setShareModalOpen(true)} className="flex items-center transition-colors hover:text-zinc-900 dark:hover:text-zinc-100" aria-label={`分享文章：${post.title}`}>
+                  <Share2 size={14} className="mr-1.5" /> 分享
+                </button>
+              </div>
             </div>
           </motion.div>
         </header>
